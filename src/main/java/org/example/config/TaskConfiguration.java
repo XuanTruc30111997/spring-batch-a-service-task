@@ -1,4 +1,5 @@
 package org.example.config;
+import org.example.constants.Constants;
 import org.example.processor.ProductTransformProcessor;
 import org.example.reader.ProductFileReader;
 import org.example.writer.ProductWriter;
@@ -7,12 +8,15 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class TaskConfiguration {
+    @Autowired
+    ProductWriter productWriter;
 
     @Bean
     public ProductFileReader reader() {
@@ -29,7 +33,7 @@ public class TaskConfiguration {
     @Bean
     public Step writeProducts(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("writeProducts", jobRepository)
-                .tasklet(new ProductWriter(), transactionManager)
+                .tasklet(productWriter, transactionManager)
                 .build();
     }
 
@@ -40,9 +44,9 @@ public class TaskConfiguration {
                 .build();
     }
 
-    @Bean
+    @Bean(name = Constants.JOB_NAME)
     public Job job(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new JobBuilder("taskletsJob", jobRepository)
+        return new JobBuilder(Constants.JOB_NAME, jobRepository)
                 .start(readProducts(jobRepository, transactionManager))
                 .next(processProducts(jobRepository, transactionManager))
                 .next(writeProducts(jobRepository, transactionManager))
