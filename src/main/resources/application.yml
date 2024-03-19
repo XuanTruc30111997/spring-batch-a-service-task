@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scdf-share
+    username: scdf-share-db
+    password: scdf-share-db
+  jba:
+    hibernate:
+      ddl-auto: none
+      dialect: org.hibernate.dialect.PostgreSQL95Dialect
+    show-sql: true
+    generate-ddl: false
+  batch:
+    jdbc:
+      initialize-schema: always
+#      initialize-schema: never
+
+
+ahihi:
+  test: "ahihi"
